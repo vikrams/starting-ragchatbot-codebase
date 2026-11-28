@@ -30,3 +30,11 @@ extend-exclude = '''
   | \.trees
 )/
 '''
+
+[tool.pytest.ini_options]
+testpaths = ["backend/test"]
+pythonpath = ["backend"]
+addopts = "-ra --strict-markers"
+markers = [
+    "functional: hits the real Anthropic API (needs key + network)",
+]
