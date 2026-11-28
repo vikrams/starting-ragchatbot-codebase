@@ -26,12 +26,19 @@ This application is a full-stack web application that enables users to query cou
    uv sync
    ```
 
-3. **Set up environment variables**
-   
-   Create a `.env` file in the root directory:
-   ```bash
-   ANTHROPIC_API_KEY=your_anthropic_api_key_here
-   ```
+3. **Authenticate with Anthropic** (choose one)
+
+   - **Sign in with the `ant` CLI** (no key to manage):
+     ```bash
+     brew install anthropics/tap/ant
+     ant auth login
+     ```
+     Leave `ANTHROPIC_API_KEY` unset. The SDK (`anthropic>=2.14.0`) uses your sign-in; re-run `ant auth login` if it expires.
+   - **API key**: create a `.env` file in the root directory:
+     ```bash
+     ANTHROPIC_API_KEY=your_anthropic_api_key_here
+     ```
+     If set, the key takes priority over the CLI sign-in.
 
 ## Running the Application
 

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Always use `uv` to run the server and manage dependencies. Do not use `pip` directly.
 
-Uses `uv` and Python 3.13+. Requires `ANTHROPIC_API_KEY` in `.env` (see `.env.example`).
+Uses `uv` and Python 3.13+. Auth: either run `ant auth login` (the SDK, `anthropic>=2.14.0`, picks up the sign-in) or set `ANTHROPIC_API_KEY` in `.env` (see `.env.example`). A set key takes priority over the sign-in, so an invalid key causes a 401 even when signed in.
 
 ```bash
 uv sync                     # install dependencies
@@ -15,7 +15,7 @@ uv sync                     # install dependencies
 cd backend && uv run uvicorn app:app --reload --port 8000
 ```
 
-There is no test suite, linter, or build step configured. `main.py` at the root is an unused stub.
+Tests: `cd backend && uv run pytest test` (all; real-API tests are marked `functional`), or add `-m "not functional"` for offline only. No linter or build step is configured. `main.py` at the root is an unused stub.
 
 ## Architecture
 
