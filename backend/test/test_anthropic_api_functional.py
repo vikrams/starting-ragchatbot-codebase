@@ -1,4 +1,5 @@
 """Functional tests: real calls to the Anthropic API (no mocks)."""
+
 import anthropic
 import pytest
 
@@ -54,16 +55,24 @@ def test_bad_model_id_raises_not_found(api_key):
 def test_two_sequential_tool_calls(generator):
     """Second call depends on the first result -> two rounds, 3 API calls max."""
     tools = [
-        {"name": "get_lesson_title",
-         "description": "Return the title of a lesson number of course X.",
-         "input_schema": {"type": "object",
-                          "properties": {"lesson": {"type": "integer"}},
-                          "required": ["lesson"]}},
-        {"name": "find_course_by_topic",
-         "description": "Find a course about a topic string.",
-         "input_schema": {"type": "object",
-                          "properties": {"topic": {"type": "string"}},
-                          "required": ["topic"]}},
+        {
+            "name": "get_lesson_title",
+            "description": "Return the title of a lesson number of course X.",
+            "input_schema": {
+                "type": "object",
+                "properties": {"lesson": {"type": "integer"}},
+                "required": ["lesson"],
+            },
+        },
+        {
+            "name": "find_course_by_topic",
+            "description": "Find a course about a topic string.",
+            "input_schema": {
+                "type": "object",
+                "properties": {"topic": {"type": "string"}},
+                "required": ["topic"],
+            },
+        },
     ]
 
     class TM:
@@ -71,14 +80,20 @@ def test_two_sequential_tool_calls(generator):
 
         def execute_tool(self, name, **kw):
             self.calls.append((name, kw))
-            return "Quantum Gardening" if name == "get_lesson_title" else "Course: Plants 101"
+            return (
+                "Quantum Gardening"
+                if name == "get_lesson_title"
+                else "Course: Plants 101"
+            )
 
     tm = TM()
     tm.calls = []
     answer = generator.generate_response(
         "Find a course on the same topic as lesson 4 of course X. First get the "
         "lesson title, then search for a course on that topic.",
-        tools=tools, tool_manager=tm)
+        tools=tools,
+        tool_manager=tm,
+    )
     assert [c[0] for c in tm.calls] == ["get_lesson_title", "find_course_by_topic"]
     assert "quantum" in tm.calls[1][1]["topic"].lower()
     assert "Plants 101" in answer

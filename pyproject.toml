@@ -17,4 +17,16 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=9.2.0",
+    "black>=25.1.0",
 ]
+
+[tool.black]
+line-length = 88
+target-version = ["py313"]
+extend-exclude = '''
+/(
+  chroma_db
+  | \.venv
+  | \.trees
+)/
+'''

@@ -1,9 +1,10 @@
 import anthropic
 from typing import List, Optional, Dict, Any
 
+
 class AIGenerator:
     """Handles interactions with Anthropic's Claude API for generating responses"""
-    
+
     # Static system prompt to avoid rebuilding on each call
     SYSTEM_PROMPT = """ You are an AI assistant specialized in course materials and educational content with access to a comprehensive search tool for course information.
 
@@ -29,18 +30,15 @@ All responses must be:
 4. **Example-supported** - Include relevant examples when they aid understanding
 Provide only the direct answer to what was asked.
 """
-    
+
     def __init__(self, api_key: Optional[str], model: str):
         # Empty/None key -> SDK falls back to `ant auth login` credentials
         self.client = anthropic.Anthropic(api_key=api_key or None)
         self.model = model
-        
+
         # Pre-build base API parameters
-        self.base_params = {
-            "model": self.model,
-            "max_tokens": 1500
-        }
-    
+        self.base_params = {"model": self.model, "max_tokens": 1500}
+
     @staticmethod
     def _extract_text(response) -> str:
         """Join the text blocks of a response, skipping thinking/tool_use blocks"""
@@ -60,18 +58,28 @@ Provide only the direct answer to what was asked.
                 continue
             try:
                 content = tool_manager.execute_tool(block.name, **block.input)
-                results.append({"type": "tool_result", "tool_use_id": block.id,
-                                "content": content})
+                results.append(
+                    {"type": "tool_result", "tool_use_id": block.id, "content": content}
+                )
             except Exception as e:
                 failed = True
-                results.append({"type": "tool_result", "tool_use_id": block.id,
-                                "content": f"Tool error: {e}", "is_error": True})
+                results.append(
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": block.id,
+                        "content": f"Tool error: {e}",
+                        "is_error": True,
+                    }
+                )
         return results, failed
 
-    def generate_response(self, query: str,
-                         conversation_history: Optional[str] = None,
-                         tools: Optional[List] = None,
-                         tool_manager=None) -> str:
+    def generate_response(
+        self,
+        query: str,
+        conversation_history: Optional[str] = None,
+        tools: Optional[List] = None,
+        tool_manager=None,
+    ) -> str:
         """
         Generate AI response with optional tool usage and conversation context.
 
@@ -88,7 +96,11 @@ Provide only the direct answer to what was asked.
         messages = [{"role": "user", "content": query}]
 
         def call(tool_choice):
-            params = {**self.base_params, "messages": messages, "system": system_content}
+            params = {
+                **self.base_params,
+                "messages": messages,
+                "system": system_content,
+            }
             if tools:
                 # Tools stay on every call (replayed thinking blocks are bound
                 # to them); tool_choice controls whether they may be used.

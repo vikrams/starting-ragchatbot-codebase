@@ -1,5 +1,6 @@
 """Functional tests: CourseSearchTool / CourseOutlineTool / ToolManager against a real
 (temporary) ChromaDB with local embeddings. No Anthropic calls."""
+
 import pytest
 
 from search_tools import CourseOutlineTool, CourseSearchTool, ToolManager

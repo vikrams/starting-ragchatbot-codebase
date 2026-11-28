@@ -4,6 +4,7 @@ Most tests script the model (a fake generator that calls the tools through the r
 ToolManager, as Claude would) so retrieval, sources and sessions are verified without
 the Anthropic API. The last test uses the real API.
 """
+
 import pytest
 
 
@@ -13,8 +14,9 @@ class ScriptedGenerator:
     def __init__(self, calls, answer="scripted answer"):
         self.calls, self.answer, self.seen = calls, answer, []
 
-    def generate_response(self, query, conversation_history=None, tools=None,
-                          tool_manager=None):
+    def generate_response(
+        self, query, conversation_history=None, tools=None, tool_manager=None
+    ):
         self.seen.append((query, conversation_history, tools))
         for name, kwargs in self.calls:
             tool_manager.execute_tool(name, **kwargs)
@@ -43,9 +45,18 @@ def test_query_passes_both_tools_to_model(rag, scripted):
 
 
 def test_query_returns_sources_from_search_then_resets(rag, scripted):
-    scripted([("search_course_content",
-               {"query": "introduction", "course_name": "Computer Use",
-                "lesson_number": 0})])
+    scripted(
+        [
+            (
+                "search_course_content",
+                {
+                    "query": "introduction",
+                    "course_name": "Computer Use",
+                    "lesson_number": 0,
+                },
+            )
+        ]
+    )
     answer, sources = rag.query("what's in lesson 0?")
     assert answer == "scripted answer"
     assert sources and sources[0]["text"].endswith("Lesson 0")
