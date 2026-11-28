@@ -18,3 +18,11 @@ dependencies = [
 dev = [
     "pytest>=9.2.0",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/test"]
+pythonpath = ["backend"]
+addopts = "-ra --strict-markers"
+markers = [
+    "functional: hits the real Anthropic API (needs key + network)",
+]
